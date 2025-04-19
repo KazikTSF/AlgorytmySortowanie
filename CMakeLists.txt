@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.30)
-project(SD_Projekt2 LANGUAGES CXX)
+project(AlgorytmySortowanie LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-enable_testing()
-
-add_subdirectory(src)
-add_subdirectory(test)
+add_executable(Sorting
+        main.cpp
+        Sorting.hpp
+)
