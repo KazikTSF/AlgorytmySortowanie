@@ -18,9 +18,7 @@ class Sorting {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution dis(start, stop);
-    int random = dis(gen);
-    std::swap(arr[start], arr[random]);
-    int pivot = arr[start];
+    int pivot = arr[dis(gen)];
 
     int i = start - 1;
     int j = stop + 1;
