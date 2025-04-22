@@ -1,28 +1,69 @@
 #ifndef QUICKSORT_HPP
 #define QUICKSORT_HPP
+#include <cmath>
 #include <memory>
 #include <random>
 template <class T>
 class Sorting {
  public:
-  static void quickSort(T* array, const int start, const int stop) {
-    if (start >= stop) {
-      return;
-    }
-    const int pivot = partition(array, start, stop);
-    quickSort(array, start, pivot);
-    quickSort(array, pivot + 1, stop);
+  static void quickSort(T* array, const int size) {
+    quickSortUtil(array, 0, size - 1);
   }
-  static void mergeSort(T* array, const int start, const int stop) {
+  static void mergeSort(T* array, const int size) {
+    mergeSortUtil(array, 0, size - 1);
+  }
+
+  static void introSort(T* array, const int size) {
+    const int depthLimit = 2 * static_cast<int>(log(size));
+
+    introSortUtil(array, 0, size - 1, depthLimit);
+  }
+
+ private:
+  static void mergeSortUtil(T* array, const int start, const int stop) {
     if (start >= stop) {
       return;
     }
     const int mid = std::midpoint(start, stop);
-    mergeSort(array, start, mid);
-    mergeSort(array, mid + 1, stop);
+    mergeSortUtil(array, start, mid);
+    mergeSortUtil(array, mid + 1, stop);
     merge(array, start, mid, stop);
   }
- private:
+  static void quickSortUtil(T* array, const int start, const int stop) {
+    if (start >= stop) {
+      return;
+    }
+    const int pivot = partition(array, start, stop);
+    quickSortUtil(array, start, pivot);
+    quickSortUtil(array, pivot + 1, stop);
+  }
+  static void insertionSort(T* array, const int size) {
+    for (int i = 1; i < size; i++) {
+      T key = array[i];
+      int j = i - 1;
+      while (j >= 0 && array[j] > key) {
+        array[j + 1] = array[j];
+        j--;
+      }
+      array[j + 1] = key;
+    }
+  }
+  static void introSortUtil(T* array, const int start, const int stop,
+                            const int depthLimit) {
+    if (stop - start < 16) {
+      insertionSort(array+start, stop - start + 1);
+      return;
+    }
+
+    if (depthLimit <= 0) {
+      std::make_heap(array + start, array + stop + 1);
+      std::sort_heap(array + start, array + stop + 1);
+      return;
+    }
+    const int pivot = partition(array, start, stop);
+    introSortUtil(array, start, pivot, depthLimit - 1);
+    introSortUtil(array, pivot + 1, stop, depthLimit - 1);
+  }
   static int partition(T* arr, const int start, const int stop) {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -89,4 +130,4 @@ class Sorting {
     }
   }
 };
-#endif  // QUICKSORT_HPP
+#endif
