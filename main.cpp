@@ -2,7 +2,6 @@
 #include <iostream>
 #include <map>
 #include <string>
-#include <vector>
 
 #include "Sorting.hpp"
 void writeToFile(const std::string &filename, const std::map<int, long> &data) {
@@ -17,7 +16,7 @@ void writeToFile(const std::string &filename, const std::map<int, long> &data) {
   ofs.close();
 }
 int main() {
-  const std::array<double, 7> percentages = {0.0, .25, .5, .75, .95, .997, 1.0};
+  constexpr std::array percentages = {0.0, .25, .5, .75, .95, .997, 1.0};
   for (const double percentage : percentages) {
     auto data = Sorting<int>::test(Sorting<int>::quickSort, percentage);
     writeToFile(std::format("quickSort{}", percentage), data);

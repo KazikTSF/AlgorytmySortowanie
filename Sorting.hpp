@@ -24,14 +24,13 @@ class Sorting {
   static void prepareArr(T* array, const int size,
                          const double sortedPercentage) {
     const auto sortedSize = static_cast<int>(size * sortedPercentage);
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    auto& gen = getRandomGenerator();
     std::uniform_int_distribution<T> dis(std::numeric_limits<T>::min(),
                                          std::numeric_limits<T>::max());
     for (int i = 0; i < size; i++) {
       array[i] = dis(gen);
     }
-    quickSort(array, sortedSize - 1);
+    quickSort(array, sortedSize);
     if (sortedPercentage >= .999) {
       for (int i = 0; i <= size / 2; i++) {
         std::swap(array[i], array[size - i - 1]);
@@ -39,7 +38,7 @@ class Sorting {
     }
   }
   static std::map<int, long> test(std::function<void(T*, int)> sorting,
-                                  double sortedPercentage) {
+                                  const double sortedPercentage) {
     std::map<int, long> map;
 
     std::vector sizes = {100,    500,     1'000,   5'000,    10'000,
@@ -64,6 +63,10 @@ class Sorting {
   }
 
  private:
+  static std::mt19937& getRandomGenerator() {
+    static std::mt19937 gen(std::random_device{}());
+    return gen;
+  }
   static void mergeSortUtil(T* array, const int start, const int stop) {
     if (start >= stop) {
       return;
@@ -109,8 +112,7 @@ class Sorting {
     introSortUtil(array, pivot + 1, stop, depthLimit - 1);
   }
   static int partition(T* arr, const int start, const int stop) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    auto& gen = getRandomGenerator();
     std::uniform_int_distribution dis(start, stop);
     int pivot = arr[dis(gen)];
 
