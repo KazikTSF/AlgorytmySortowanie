@@ -38,24 +38,25 @@ class Sorting {
       }
     }
   }
-  static std::map<int, long> test(std::function<void(T*, int)> sorting) {
+  static std::map<int, long> test(std::function<void(T*, int)> sorting,
+                                  double sortedPercentage) {
     std::map<int, long> map;
-    std::vector sizes = {100,    500,     1'000,   5'000,
-                         10'000, 100'000, 500'000, 1'000'000};
-    std::vector<double> percentages = {0, .25, .5, .75, .95, .997, 1};
+
+    std::vector sizes = {100,    500,     1'000,   5'000,    10'000,
+                         50'000, 100'000, 500'000, 1'000'000};
     for (const int size : sizes) {
       long res = 0;
       for (int i = 0; i < 100; i++) {
-        for (const double percentage : percentages) {
-          auto array = std::make_unique<T[]>(size);
-          prepareArr(array, size, percentage);
-          auto start = std::chrono::high_resolution_clock::now();
-          sorting(array, size);
-          auto finish = std::chrono::high_resolution_clock::now();
-          res += std::chrono::duration_cast<std::chrono::microseconds>(finish -
-                                                                       start)
-                     .count();
-        }
+        std::cout << "Test " << i << " for size " << size << " percetage "
+                  << sortedPercentage << std::endl;
+        auto array = std::make_unique<T[]>(size);
+        prepareArr(array.get(), size, sortedPercentage);
+        auto start = std::chrono::high_resolution_clock::now();
+        sorting(array.get(), size);
+        auto finish = std::chrono::high_resolution_clock::now();
+        res += std::chrono::duration_cast<std::chrono::microseconds>(finish -
+                                                                     start)
+                   .count();
       }
       map.insert(std::pair(size, res / 100));
     }
