@@ -1,6 +1,9 @@
 #ifndef QUICKSORT_HPP
 #define QUICKSORT_HPP
+#include <chrono>
 #include <cmath>
+#include <functional>
+#include <map>
 #include <memory>
 #include <random>
 template <class T>
@@ -17,6 +20,46 @@ class Sorting {
     const int depthLimit = 2 * static_cast<int>(log(size));
 
     introSortUtil(array, 0, size - 1, depthLimit);
+  }
+  static void prepareArr(T* array, const int size,
+                         const double sortedPercentage) {
+    const auto sortedSize = static_cast<int>(size * sortedPercentage);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<T> dis(std::numeric_limits<T>::min(),
+                                         std::numeric_limits<T>::max());
+    for (int i = 0; i < size; i++) {
+      array[i] = dis(gen);
+    }
+    quickSort(array, sortedSize - 1);
+    if (sortedPercentage >= .999) {
+      for (int i = 0; i <= size / 2; i++) {
+        std::swap(array[i], array[size - i - 1]);
+      }
+    }
+  }
+  static std::map<int, long> test(std::function<void(T*, int)> sorting) {
+    std::map<int, long> map;
+    std::vector sizes = {100,    500,     1'000,   5'000,
+                         10'000, 100'000, 500'000, 1'000'000};
+    std::vector<double> percentages = {0, .25, .5, .75, .95, .997, 1};
+    for (const int size : sizes) {
+      long res = 0;
+      for (int i = 0; i < 100; i++) {
+        for (const double percentage : percentages) {
+          auto array = std::make_unique<T[]>(size);
+          prepareArr(array, size, percentage);
+          auto start = std::chrono::high_resolution_clock::now();
+          sorting(array, size);
+          auto finish = std::chrono::high_resolution_clock::now();
+          res += std::chrono::duration_cast<std::chrono::microseconds>(finish -
+                                                                       start)
+                     .count();
+        }
+      }
+      map.insert(std::pair(size, res / 100));
+    }
+    return map;
   }
 
  private:
@@ -51,7 +94,7 @@ class Sorting {
   static void introSortUtil(T* array, const int start, const int stop,
                             const int depthLimit) {
     if (stop - start < 16) {
-      insertionSort(array+start, stop - start + 1);
+      insertionSort(array + start, stop - start + 1);
       return;
     }
 
